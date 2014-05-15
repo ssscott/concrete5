@@ -53,6 +53,7 @@
 	require($cdir . '/config/theme_paths.php');
 
 	## Load session handlers
+	## Must come before full page caching
 	require($cdir . '/startup/session.php');
 
 	## Early loading full page cache
@@ -70,7 +71,7 @@
 
 	## Load the database ##
 	Loader::database();
-
+	
 	## User level config ##
 	if (!$config_check_failed) {
 		require($cdir . '/config/app.php');
@@ -79,11 +80,11 @@
 	## Startup check ##
 	require($cdir . '/startup/encoding_check.php');
 
+	## Security helpers
+	require($cdir . '/startup/security.php');
+
 	# Startup check, install ##
 	require($cdir . '/startup/config_check_complete.php');
-
-	# Must come before packages 
-	require($cdir . '/startup/tools_upgrade_check.php');
 
 	## Determines whether we can use the more efficient permission local caching
 	require($cdir . '/startup/permission_cache_check.php');
@@ -92,15 +93,16 @@
 	## This MUST be run before packages start - since they check ACTIVE_LOCALE which is defined here ##
 	require($cdir . '/config/localization.php');
 
-	## Security helpers
-	require($cdir . '/startup/security.php');
-
 	## File types ##
 	## Note: these have to come after config/localization.php ##
 	require($cdir . '/config/file_types.php');
 
 	## Package events
 	require($cdir . '/startup/packages.php');
+
+	# Not sure why this said it had to come in front of startup/packages - but that causes a problem when a package
+	# defines autoload classes like for permissions and then has to act on permissions in upgrade. It can't find the classes
+	require($cdir . '/startup/tools_upgrade_check.php');
 
 	## Load permissions and attributes
 	PermissionKey::loadAll();
@@ -215,7 +217,7 @@
 
 		$vp = new Permissions($c->getVersionObject());
 
-		if ($_REQUEST['ccm-disable-controls'] == true || intval($cvID) > 0) {
+		if (isset($_REQUEST['ccm-disable-controls']) && ($_REQUEST['ccm-disable-controls'] == true || $cvID > 0)) {
 			$v = View::getInstance();
 			$v->disableEditing();
 			$v->disableLinks();
@@ -238,6 +240,9 @@
 			}
 		}
 
+		## Fire the on_page_view Eventclass
+		Events::fire('on_page_view', $c, $u);
+
 		## Any custom site-related process
 		if (file_exists(DIR_BASE . '/config/site_process.php')) {
 			require(DIR_BASE . '/config/site_process.php');
@@ -252,9 +257,6 @@
 		if (STATISTICS_TRACK_PAGE_VIEWS == 1) {
 			$u->recordView($c);
 		}
-
-		## Fire the on_page_view Eventclass
-		Events::fire('on_page_view', $c, $u);
 
 		## now we display (provided we've gotten this far)
 

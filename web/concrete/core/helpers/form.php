@@ -87,13 +87,14 @@ class Concrete5_Helper_Form {
 	 * Creates a hidden form field. 
 	 * @param string $key
 	 * @param string $value
+	 * @param array $miscFields Additional fields appended at the end of the input
 	 */
-	public function hidden($key, $value = null) {
+	public function hidden($key, $value = null, $miscFields = array()) {
 		$val = $this->getRequestValue($key);
 		if ($val !== false && (!is_array($val))) {
 			$value = $val;
 		}
-		$str = '<input type="hidden" name="' . $key . '" id="' . $key . '" value="' . $value . '" />';
+		$str = '<input type="hidden" name="' . $key . '" id="' . $key . '" value="' . $value . '"' . $this->parseMiscFields('ccm-input-hidden ', $miscFields) . ' />';
 		return $str;
 	}
 
@@ -109,14 +110,14 @@ class Concrete5_Helper_Form {
 		$id = $key;
 		$_field = $key;
 
-		if ((strpos($key, '[]') + 2) == strlen($key)) {
-			$_field = substr($key, 0, strpos($key, '[]'));
+		if (substr($key, -2) == '[]') {
+			$_field = substr($key, 0, -2);
 			$id = $_field . '_' . $value;
 		}
 
 		if ($isChecked && (!isset($_REQUEST[$_field])) && ($_SERVER['REQUEST_METHOD'] != 'POST')) {
 			$checked = true;
-		} else if ($this->getRequestValue($key) == $value) {
+		} else if ($this->getRequestValue($key) == $value && $value != false) {
 			$checked = true;
 		} else if (is_array($this->getRequestValue($key)) && in_array($value, $this->getRequestValue($key))) {
 			$checked = true;
@@ -254,7 +255,17 @@ class Concrete5_Helper_Form {
 	 */
 	public function text($key, $valueOrArray = false, $miscFields = array()) {
 		return $this->inputType($key, 'text', $valueOrArray, $miscFields);
-
+	}
+	
+	/**
+	* Renders a number input field.
+	* @param string $key Input element's name and id
+	* @param string|array $valueOrArray Either the default value (subject to be overridden by $_REQUEST) or $miscFields (see below)
+	* @param array $miscFields A hash array with html attributes as key/value pairs (possibly including "class")
+	* @return $html
+	*/
+	public function number($key, $valueOrArray = false, $miscFields = array()) {
+		return $this->inputType($key, 'number', $valueOrArray, $miscFields);	
 	}
 
 	/**
@@ -300,9 +311,31 @@ class Concrete5_Helper_Form {
 	public function search($key, $valueOrArray = false, $miscFields = array()) {
 		return $this->inputType($key, 'search', $valueOrArray, $miscFields);
 	}
+	
+	/**
+	 * Renders a image input field.
+	 * @param string $key Input element's name and id
+	 * @param int|string $image Image fID or relative path to image
+	 * @param string|array $valueOrArray Either the default value (subject to be overridden by $_REQUEST) or $miscFields (see below)
+	 * @param array $miscFields A hash array with html attributes as key/value pairs (possibly including "class")
+	 * @return $html
+	 */
+	public function image($key, $image, $valueOrArray = false, $miscFields = array()) {
+		if(is_numeric($image)){
+			$image_path = File::getRelativePathFromID($image);
+		} else {
+			$image_path = $image;
+		}
+		if(is_array($valueOrArray)|| $valueOrArray===false){
+			$valueOrArray['src'] = $image_path;
+		} else {
+			$miscFields['src'] = $image_path;
+		}
+		return $this->inputType($key, 'image', $valueOrArray, $miscFields);
+	}
 
 	/**
-	 * Renders a select field. First argument is the name of the field. Second is an associative array of key => display. Second argument is either the value of the field to be selected (and if it's blank we check post) or a misc. array of fields
+	 * Renders a select field. First argument is the name of the field. Second is an associative array of key => display. Third argument is either the value of the field to be selected (and if it's blank we check post) or a misc. array of fields
 	 * @param string $key
 	 * @return $html
 	 */
@@ -312,8 +345,8 @@ class Concrete5_Helper_Form {
 			$valueOrArray = $val[0];
 		}
 
-		if ((strpos($key, '[]') + 2) == strlen($key)) {
-			$_key = substr($key, 0, strpos($key, '[]'));
+		if (substr($key, -2) == '[]') {
+			$_key = substr($key, 0, -2);
 			$id = $_key . $this->selectIndex;
 		} else {
 			$_key = $key;

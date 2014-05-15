@@ -197,6 +197,7 @@ activateReorder = function() {
 				height: 350, 
 				onClose: function() {
 					showBranch(origCID);
+					SITEMAP_LAST_DIALOGUE_URL='';
 				}
 			});
 			hideBranch(origCID);
@@ -446,6 +447,7 @@ activateLabels = function(instance_id, display_mode, select_mode) {
 					appendButtons: true,
 					onClose: function() {
 						showBranch(origCID);
+						SITEMAP_LAST_DIALOGUE_URL='';
 					}
 				});
 				//hideBranch(origCID);
@@ -488,6 +490,10 @@ ccm_triggerProgressiveOperation = function(url, params, dialogTitle, onComplete,
 				open: function(e, ui) {				
 					$('.ui-dialog-titlebar-close', this.parentNode).hide();
 					var totalItems = $('#ccm-progressive-operation-progress-bar').attr('data-total-items');
+					params.push({
+						'name': 'process',
+						'value': '1'
+					});
 					ccm_doProgressiveOperation(url, params, totalItems, onComplete, onError);
 				}
 			});
@@ -497,11 +503,6 @@ ccm_triggerProgressiveOperation = function(url, params, dialogTitle, onComplete,
 }
 
 ccm_doProgressiveOperation = function(url, params, totalItems, onComplete, onError) {
-	params.push({
-		'name': 'process',
-		'value': '1'
-	});
-	params['process'] = true;
 	$.ajax({
 		url: url,
 		dataType: 'json',
@@ -983,6 +984,26 @@ ccm_sitemapSearchSetupCheckboxes = function(instance_id) {
 					modal: false,
 					appendButtons: true,
 					href: CCM_TOOLS_PATH + '/pages/permissions?' + cIDstring,
+					title: ccmi18n_sitemap.pagePermissionsTitle				
+				});
+				break;
+			case 'permissions_add_access':
+				jQuery.fn.dialog.open({
+					width: 440,
+					height: 200,
+					modal: false,
+					appendButtons: true,
+					href: CCM_TOOLS_PATH + '/pages/permissions_access?task=add&' + cIDstring,
+					title: ccmi18n_sitemap.pagePermissionsTitle				
+				});
+				break;
+			case 'permissions_remove_access':
+				jQuery.fn.dialog.open({
+					width: 440,
+					height: 300,
+					modal: false,
+					appendButtons: true,
+					href: CCM_TOOLS_PATH + '/pages/permissions_access?task=remove&' + cIDstring,
 					title: ccmi18n_sitemap.pagePermissionsTitle				
 				});
 				break;

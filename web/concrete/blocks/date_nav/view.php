@@ -4,38 +4,8 @@ defined('C5_EXECUTE') or die("Access Denied.");
 global $c;
 $textHelper = Loader::helper("text"); 
 $dateHelper = Loader::helper("date"); 
-
-/*
-// now that we're in the specialized content file for this block type, 
-// we'll include this block type's class, and pass the block to it, and get
-// the content
-	
-if (count($cArray) > 0) { ?>
-<div class="ccm-page-list">
-	
-	<?php  for ($i = 0; $i < count($cArray); $i++ ) {
-		$cobj = $cArray[$i];
-		$title = $cobj->getCollectionName(); ?>
-	
-	<h3 class="ccm-page-list-title"><a href="<?php echo $nh->getLinkToCollection($cobj)?>"><?php echo $title?></a></h3>
-	<div class="ccm-page-list-description">
-		<?php 
-		if(!$controller->truncateSummaries){
-			echo $cobj->getCollectionDescription();
-		}else{
-			echo $textHelper->shorten($cobj->getCollectionDescription(),$controller->truncateChars);
-		}
-		?>
-	</div>
-	
-	<?php   } ?>
-</div>
-<?php  } 
- 
-*/
 ?>
-	
-	 
+
 <div id="ccmDateNav<?php echo $bID?>" class="ccmDateNav">
 <?php   
 
@@ -56,7 +26,7 @@ foreach($cArray as $page){
 //don't show the outer years UL with flat display
 if( count($postsByDate)>1 && !$controller->flatDisplay ) echo "<ul class='years'> \r \n";
 		
-$monthDisplayFormat = ($controller->flatDisplay && count($postsByDate)>1) ? 'F Y' : 'F'; 
+$monthDisplayFormat = ($controller->flatDisplay && count($postsByDate)>1) ? tc(/*i18n: http://php.net/manual/en/function.date.php */'DateNavView', 'F Y') : tc(/*i18n: http://php.net/manual/en/function.date.php */'DateNavView', 'F'); 
 		
 //show the outer months UL with flat display
 if($controller->flatDisplay) echo "\t <ul class='months collapsible ".$hideMonths."'> \r \n";		

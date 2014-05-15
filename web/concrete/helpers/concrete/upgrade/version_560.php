@@ -101,6 +101,11 @@ class ConcreteUpgradeVersion560Helper {
 			$bt->refresh();
 		}
 
+		$bt = BlockType::getByHandle('search');
+		if (is_object($bt)) {
+			$bt->refresh();
+		}
+
 		$sp = Page::getByPath('/dashboard/users/group_sets');
 		if ($sp->isError()) {
 			$d11 = SinglePage::add('/dashboard/users/group_sets');
@@ -235,8 +240,9 @@ class ConcreteUpgradeVersion560Helper {
 			);
 		foreach ($pageKeywords as $page => $keywords) {
 			$p = Page::getByPath($page, 'ACTIVE');
-			if (is_object($p) && !$p->isError()) {
-			$p->setAttribute('meta_keywords', $keywords);
+			$ak = CollectionAttributeKey::getByHandle('meta_keywords');
+			if (is_object($p) && !$p->isError() && $ak instanceof AttributeKey) {
+				$p->setAttribute('meta_keywords', $keywords);
 			}
 		}	
 		// install the permissions from permissions.xml
@@ -282,7 +288,7 @@ class ConcreteUpgradeVersion560Helper {
 							$pa = $pko->getPermissionAccessObject();
 							if (!is_object($pa)) {
 								$pa = PermissionAccess::create($pko);
-							} else if ($pa->isPermissionKeyInUse()) {
+							} else if ($pa->isPermissionAccessInUse()) {
 								$pa = $pa->duplicate();
 							}
 							$pa->addListItem($pe, false, PermissionKey::ACCESS_TYPE_INCLUDE);	

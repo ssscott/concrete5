@@ -24,8 +24,8 @@ class Concrete5_Model_UserList extends DatabaseItemList {
 	public $searchAgainstEmail=0;
 	
 	//Filter by uName
-	public function filterByUserName($type) {
-		$this->filter('u.uName', $type, '=');
+	public function filterByUserName($username) {
+		$this->filter('u.uName', $username, '=');
 	}
 	
 	public function filterByKeywords($keywords) {
@@ -62,6 +62,9 @@ class Concrete5_Model_UserList extends DatabaseItemList {
 	}
 
 	public function filterByGroupID($gID){ 
+		if (!Loader::helper('validation/numbers')->integer($gID)) {
+			$gID = 0;
+		}
 		$tbl='ug_'.$gID;
 		$this->addToQuery("left join UserGroups $tbl on {$tbl}.uID = u.uID ");			
 		$this->filter(false, "{$tbl}.gID=".$gID);

@@ -1,4 +1,6 @@
-<?php defined('C5_EXECUTE') or die("Access Denied.");  ?>
+<?php defined('C5_EXECUTE') or die("Access Denied.");
+$dh = Loader::helper("date");
+?>
 <div class="grid_4 alpha omega" id="main-content-sidebar-archives">
 	<h3><?php echo $title ?></h3>
 	<?php
@@ -6,7 +8,7 @@
 		$startDt = new DateTime();
 		$firstPost = new DateTime($firstPost->format('m/01/Y'));
 		$first = date_diff($startDt,$firstPost);
-		$first = $first->m;
+		$first = $first->m + $first->y * 12;
 		
 		if($first > $numMonths) {
 			$first = $numMonths;
@@ -28,9 +30,9 @@
 				?>
 				<li>
 				<?php if($target instanceof Page) { ?>
-						<a href="<?php echo $navigation->getLinkToCollection($target)."?year=".$workingDt->format('Y'). "&month=".$workingDt->format('m') ?>" <?php echo ($workingDt->format('m-Y') == $_REQUEST['month']?'class="selected"':'')?>><?php echo $workingDt->format('M') ?></a>
+						<a href="<?php echo $navigation->getLinkToCollection($target)."?year=".$workingDt->format('Y'). "&month=".$workingDt->format('m') ?>" <?php echo ($workingDt->format('m-Y') == $_REQUEST['month']?'class="selected"':'')?>><?php echo $dh->dateTimeFormatLocal($workingDt,'M') ?></a>
 				<?php } else { ?>
-						<?php echo $workingDt->format('M') ?>
+						<?php echo $dh->dateTimeFormatLocal($workingDt,'M') ?>
 				<?php } ?>
 				</li>
 				<?php

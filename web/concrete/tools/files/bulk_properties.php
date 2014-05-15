@@ -7,7 +7,7 @@ $previewMode = false;
 
 $fp = FilePermissions::getGlobal();
 if (!$fp->canAccessFileManager()) {
-	die(t("Access Denied."));
+	die(t("Unable to access the file manager."));
 }  
 
 $attribs = FileAttributeKey::getUserAddedList();
@@ -212,7 +212,7 @@ function printFileAttributeRow($ak, $fv, $value) {
 	
 	$html = '
 	<tr class="ccm-attribute-editable-field">
-		<td><strong><a href="javascript:void(0)">' . tc('AttributeKeyName', $ak->getAttributeKeyName()) . '</a></strong></td>
+		<td><strong><a href="javascript:void(0)">' . $ak->getAttributeKeyDisplayName() . '</a></strong></td>
 		<td width="100%" class="ccm-attribute-editable-field-central"><div class="ccm-attribute-editable-field-text">' . $text . '</div>
 		<form method="post" action="' . REL_DIR_FILES_TOOLS_REQUIRED . '/files/bulk_properties">
 			<input type="hidden" name="fakID" value="' . $ak->getAttributeKeyID() . '" />
@@ -233,7 +233,7 @@ function printFileAttributeRow($ak, $fv, $value) {
 
 	$html = '
 	<tr>
-		<td><strong>' . tc('AttributeKeyName', $ak->getAttributeKeyName()) . '</strong></td>
+		<td><strong>' . $ak->getAttributeKeyDisplayName() . '</strong></td>
 		<td width="100%" colspan="2">' . $text . '</td>
 	</tr>';	
 	}
@@ -297,6 +297,10 @@ table.ccm-grid th {width: 70px}
 	<td><strong><?=t('URL to File')?></strong></td>
 	<td width="100%" colspan="2"><?=$fv->getRelativePath(true)?></td>
 </tr>
+<tr>
+	<td><strong><?=t('Download URL')?></strong></td>
+	<td width="100%" colspan="2"><?=h(BASE_URL . View::url('/download_file', $fv->getFileID()))?></td>
+</tr>
 
 <tr>
 	<td><strong><?=t('Type')?></strong></td>
@@ -305,7 +309,7 @@ table.ccm-grid th {width: 70px}
 
 <tr>
 	<td><strong><?=t('Size')?></strong></td>
-	<td colspan="2"><?=$fv->getSize()?> (<?=number_format($fv->getFullSize())?> <?=t('bytes')?>)</td>
+	<td colspan="2"><?=$fv->getSize()?> (<?=Loader::helper('number')->formatSize($fv->getFullSize(), 'bytes')?>)</td>
 </tr>
 <? } ?>
 

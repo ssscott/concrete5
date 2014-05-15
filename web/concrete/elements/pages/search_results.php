@@ -38,6 +38,8 @@ if (isset($_REQUEST['searchInstance'])) {
 			<option value="speed_settings"><?=t('Speed Settings')?></option>
 			<? if (PERMISSIONS_MODEL == 'advanced') { ?>
 				<option value="permissions"><?=t('Change Permissions')?></option>
+				<option value="permissions_add_access"><?=t('Change Permissions - Add Access')?></option>
+				<option value="permissions_remove_access"><?=t('Change Permissions - Remove Access')?></option>
 			<? } ?>
 			<option value="design"><?=t('Design')?></option>
 			<option value="delete"><?=t('Delete')?></option>
@@ -125,8 +127,13 @@ if (isset($_REQUEST['searchInstance'])) {
 				cAlias="false"
 				<?=$dsh->getPermissionsNodes($permissionArray);?>>
 			<? if (!$searchDialog) { ?><td class="ccm-<?=$searchInstance?>-list-cb" style="vertical-align: middle !important"><input type="checkbox" value="<?=$cobj->getCollectionID()?>" /></td><? } ?>
-
+			<?php if ($pageList->isIndexedSearch()){?>
+			<td>
+			   <?= $cobj->getPageIndexScore();?>
+			</td>
+			<?php } ?>
 			<? foreach($columns->getColumns() as $col) { ?>
+
 				<? if ($col->getColumnKey() == 'cvName') { ?>
 					<td class="ccm-page-list-name"><?=$txt->highlightSearch($cobj->getCollectionName(), $keywords)?></td>		
 				<? } else { ?>

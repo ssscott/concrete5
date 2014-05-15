@@ -7,6 +7,8 @@ $ih = Loader::helper('concrete/interface');
 $form = Loader::helper('form');
 /* @var $jh JsonHelper */
 $jh = Loader::helper('json');
+/* @var $dh DateHelper */
+$dh = Loader::helper('date');
 
 ?>
 <style type="text/css">
@@ -69,14 +71,14 @@ $jh = Loader::helper('json');
 			<td><i class="icon-question-sign" title="<?=$j->getJobDescription()?>"></i> <?=$j->getJobName()?></td>
 			<td class="jDateLastRun"><?
 				if ($j->getJobStatus() == 'RUNNING') {
-					$runtime = date(DATE_APP_GENERIC_MDYT_FULL_SECONDS, strtotime($j->getJobDateLastRun()));
+					$runtime = $dh->date(DATE_APP_GENERIC_MDYT_FULL_SECONDS, strtotime($j->getJobDateLastRun()));
 					echo ("<strong>");
 					echo t("Running since %s", $runtime);
 					echo ("</strong>");
 				} else if($j->getJobDateLastRun() == '' || substr($j->getJobDateLastRun(), 0, 4) == '0000') {
 					echo t('Never');
 				} else {
-					$runtime = date(DATE_APP_GENERIC_MDYT_FULL_SECONDS, strtotime($j->getJobDateLastRun()) );
+					$runtime = $dh->date(DATE_APP_GENERIC_MDYT_FULL_SECONDS, strtotime($j->getJobDateLastRun()) );
 					echo $runtime;
 				}
 			?></td>
@@ -115,7 +117,7 @@ $jh = Loader::helper('json');
 						<label><?php  echo t('Run this Job Every')?></label>
 						<div class="input">
 							<?php echo $form->text('value',$j->scheduledValue,array('class'=>'span2'))?>
-							<?php echo $form->select('unit', array('hours'=>'Hours', 'days'=>'Days', 'weeks'=>'Weeks', 'months'=>'Months'), $j->scheduledInterval, array('class'=>'span2'))?>
+							<?php echo $form->select('unit', array('hours'=>t('Hours'), 'days'=>t('Days'), 'weeks'=>t('Weeks'), 'months'=>t('Months')), $j->scheduledInterval, array('class'=>'span2'))?>
 						</div>
 					</div>
 				</div>
@@ -148,7 +150,7 @@ $jh = Loader::helper('json');
 			</fieldset>
 			<div class="ccm-pane-footer">
 				<div class="ccm-buttons">
-					<input type="submit" value="Save" class="btn ccm-button-v2 primary ccm-button-v2-right">
+					<input type="submit" value="<?php echo t('Save'); ?>" class="btn ccm-button-v2 primary ccm-button-v2-right">
 				</div>	
 			</div>
 		</form>
@@ -189,7 +191,7 @@ $djs = JobSet::getDefault();
 if (is_object($djs)) { ?>
 <div class="well">
 <h4><?=t('Automation Instructions')?></h4>
-<p><?=t('To run all the jobs in the <a href="%s">%s</a> Job Set, schedule this URL using cron or a similar system:', $this->url('/dashboard/system/optimization/jobs', 'edit_set', $djs->getJobSetID()), $djs->getJobSetName())?></p>
+<p><?=t('To run all the jobs in the <a href="%s">%s</a> Job Set, schedule this URL using cron or a similar system:', $this->url('/dashboard/system/optimization/jobs', 'edit_set', $djs->getJobSetID()), $djs->getJobSetDisplayName())?></p>
 <div><input type="text" style="width: 700px" class="ccm-default-jobs-url" value="<?=BASE_URL . $this->url('/tools/required/jobs?auth=' . $auth)?>" /></div>
 </div>
 <? } ?>
@@ -248,6 +250,7 @@ if (is_object($djs)) { ?>
 			<div class="clearfix">
 				<?php echo $form->submit('submit', t('Delete Job Set'), array('class' => 'danger'))?>
 			</div>
+		</fieldset>
 		</form>
 		<? } ?>
 		</div>
@@ -310,7 +313,7 @@ if (is_object($djs)) { ?>
 					<label><?php  echo t('Run this Job Every')?></label>
 					<div class="input">
 						<?php echo $form->text('value',$set->scheduledValue,array('class'=>'span2'))?>
-						<?php echo $form->select('unit', array('hours'=>'Hours', 'days'=>'Days', 'weeks'=>'Weeks', 'months'=>'Months'), $set->scheduledInterval, array('class'=>'span2'))?>
+						<?php echo $form->select('unit', array('hours'=>t('Hours'), 'days'=>t('Days'), 'weeks'=>t('Weeks'), 'months'=>t('Months')), $set->scheduledInterval, array('class'=>'span2'))?>
 					</div>
 				</div>
 			</fieldset>
@@ -343,7 +346,7 @@ if (is_object($djs)) { ?>
 		
 			<?php foreach($jobSets as $j) { ?>
 				<div class="ccm-group" id="asID_<?php echo $j->getJobSetID()?>">
-					<a class="ccm-group-inner" href="<?php echo $this->url('/dashboard/system/optimization/jobs', 'edit_set', $j->getJobSetID())?>" style="background-image: url(<?php echo ASSETS_URL_IMAGES?>/icons/group.png)"><?php echo $j->getJobSetName()?></a>
+					<a class="ccm-group-inner" href="<?php echo $this->url('/dashboard/system/optimization/jobs', 'edit_set', $j->getJobSetID())?>" style="background-image: url(<?php echo ASSETS_URL_IMAGES?>/icons/group.png)"><?php echo $j->getJobSetDisplayName()?></a>
 				</div>
 			<?php } ?>
 		</div>
@@ -445,7 +448,7 @@ $(function() {
 			height: 550,
 			width: 650,
 			modal: true,
-			title: '<?=t('Automation Instructions')?>'
+			title: <?=$jh->encode(t('Automation Instructions'))?>
 		});
 	});
 	$('.icon-question-sign').tooltip();

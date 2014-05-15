@@ -189,7 +189,12 @@
 				$file_set->fsType 	= $fs_type;
 				$file_set->uID		= $fs_uid;
 				$file_set->save();
-				return $file_set;
+
+				$db = Loader::db();
+				$fsID = $db->Insert_Id();
+				$fs = FileSet::getByID($fsID);
+				Events::fire('on_file_set_add', $fs);
+				return $fs;
 			}			
 		}
 		
@@ -233,7 +238,7 @@
 		*/		
 		private function populateFiles(){			
 			$utility 			= new FileSetFile();
-			$this->fileSetFiles = $utility->Find('fsID=?',array($this->fsID));
+			$this->fileSetFiles = $utility->Find('fsID = ? ORDER BY fsDisplayOrder', array($this->fsID));
 		}
 		
 		public function hasFileID($f_id){
@@ -318,6 +323,7 @@
 			$db = Loader::db();
 			if ($this->fsID > 0) { 
 				$db->Execute("update FileSets set fsOverrideGlobalPermissions = 1 where fsID = ?", array($this->fsID));
+				$this->fsOverrideGlobalPermissions = true;
 			}
 			
 			if (is_array($userOrGroup)) { 
@@ -336,6 +342,8 @@
 				$pa = $pk->getPermissionAccessObject();
 				if (!is_object($pa)) {
 					$pa = PermissionAccess::create($pk);
+				} else if ($pa->isPermissionAccessInUse()) {
+					$pa = $pa->duplicate();
 				}
 				$pa->addListItem($pe, false, $accessType);
 				$pt = $pk->getPermissionAssignmentObject();
@@ -367,7 +375,7 @@
 				$file_set_file->fsfID = null;
 				$file_set_file->fID =  $f_id;			
 				$file_set_file->fsID = $fs_id;
-				$file_set_file->timestamp = null;
+				$file_set_file->timestamp = date('Y-m-d H:i:s');
 				$file_set_file->fsDisplayOrder = $fsDisplayOrder;
 				$file_set_file->Save();
 				return $file_set_file;

@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/concrete5/concrete5.png?branch=master)](https://travis-ci.org/concrete5/concrete5)
+
+
         c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c
        c5c5c5c5c5c5c5c5c-c5c5c5c5c5c5c5c
      | c5c5c5c5c5--c5c5   5c5c5c5c5c5c5c
@@ -18,6 +21,10 @@
      \  c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c    \\___]\\___/||_||_|\\___]|_|  \\___/ \\___]\\___/ \\_____/
        ------------------------------        --    --   -- --   --  --     --     --    --     ----
 
+# Version 5.7 Development
+
+Looking for concrete5 5.7 development? It has its own repository: http://github.com/concrete5/concrete5-5.7.0/
+
 # Note
 
 This is the development distribution of concrete5. It is bleeding edge. The latest development build can be downloaded from https://github.com/concrete5/concrete5/zipball/master. 
@@ -36,9 +43,18 @@ For the latest fully supported release, check out http://www.concrete5.org/downl
 
 http://concrete5.org/documentation/
 
+# Code Submissions
+
+http://www.concrete5.org/developers/submitting_code_to_concrete/
+
 ### Short Tags
 The concrete5 git repository currently uses php "short tags". Pull requests should maintain this convention. Final release versions have short tags converted to long tags. _Note:_ This issue has thoroughly discussed. Currently the shed is red but may be painted green in the future.
 
 If short tags are not enabled in your development environment you can enable them either
 * In `php.ini` add `short_open_tag = On`
 * In Apache `.htaccess` add `php_value short_open_tag 1`
+
+### Building Assets
+You *do not* need to build assets in order to run the github master
+This is only needed if you are hacking core javascript and css.
+For further details see the `build` folder.
